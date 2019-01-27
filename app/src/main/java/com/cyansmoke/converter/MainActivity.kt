@@ -18,6 +18,10 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+//выбирается валютная пара
+//в одно из полей вводится значение
+// нажимается кнопка Enter на клавиатуре и валюта переводится
+
 class MainActivity : AppCompatActivity() {
 
     val BASE_URL = "https://free.currencyconverterapi.com/api/v6/"
