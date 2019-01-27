@@ -41,12 +41,7 @@ class MainActivity : AppCompatActivity() {
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
                     //запрос на валютную пару
-                    if(editTextFirst.text.toString()!="") {
-                        progressBarMain.showIf(false)
-                        giveMePair(firstCurrency, secondCurrency, editTextFirst, editTextSecond)
-                    }else{
-                        Toast.makeText(this@MainActivity, "You must enter value", Toast.LENGTH_SHORT).show()
-                    }
+                    giveMePair(firstCurrency, secondCurrency, editTextFirst, editTextSecond)
                     true
                 }
                 else -> false
@@ -55,12 +50,7 @@ class MainActivity : AppCompatActivity() {
         editTextSecond.setOnEditorActionListener { _, actionId, _ ->
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
-                    if(editTextSecond.text.toString()!=""){
-                        progressBarMain.showIf(false)
-                        giveMePair(secondCurrency, firstCurrency, editTextSecond, editTextFirst)
-                    }else{
-                        Toast.makeText(this@MainActivity, "You must enter value", Toast.LENGTH_SHORT).show()
-                    }
+                    giveMePair(secondCurrency, firstCurrency, editTextSecond, editTextFirst)
                     true
                 }
                 else -> false
@@ -117,39 +107,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun giveMePair(first: String?, second: String?, editTextOne: EditText, editTextTwo: EditText) {
-        progressBarMain.showIf(false)
-        retrofitConnector.getCourse(first + "_" + second)
-            .enqueue(object : Callback<JsonObject> {
-                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                    progressBarMain.showIf(true)
-                    val coefficient =
-                        response.body()?.getAsJsonPrimitive(first + "_" + second).toString()
-                            .toDouble()
-                    val sum = coefficient * editTextOne.text.toString().toDouble()
-                    mapCurrencies.putIfAbsent(first + "_" + second, coefficient)
-                    editTextTwo.setText(sum.toString())
-                }
-
-                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "internet connection is bad or missing, trying to check cache...",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                    //проверяем пытались ли мы раньше перевести эти валюты
-                    if (mapCurrencies.contains(first + "_" + second)) {
-                        Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_SHORT).show()
-                        val sum =
-                            mapCurrencies.getValue(first + "_" + second) * editTextOne.text.toString().toDouble()
+        if(editTextOne.text.toString()!="") {
+            progressBarMain.showIf(false)
+            retrofitConnector.getCourse(first + "_" + second)
+                .enqueue(object : Callback<JsonObject> {
+                    override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                         progressBarMain.showIf(true)
+                        val coefficient =
+                            response.body()?.getAsJsonPrimitive(first + "_" + second).toString()
+                                .toDouble()
+                        val sum = coefficient * editTextOne.text.toString().toDouble()
+                        mapCurrencies.putIfAbsent(first + "_" + second, coefficient)
                         editTextTwo.setText(sum.toString())
-                    } else {
-                        progressBarMain.showIf(true)
-                        Toast.makeText(this@MainActivity, "Failed", Toast.LENGTH_SHORT).show()
                     }
-                }
 
-            })
+                    override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "internet connection is bad or missing, trying to check cache...",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                        //проверяем пытались ли мы раньше перевести эти валюты
+                        if (mapCurrencies.contains(first + "_" + second)) {
+                            Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_SHORT).show()
+                            val sum =
+                                mapCurrencies.getValue(first + "_" + second) * editTextOne.text.toString().toDouble()
+                            progressBarMain.showIf(true)
+                            editTextTwo.setText(sum.toString())
+                        } else {
+                            progressBarMain.showIf(true)
+                            Toast.makeText(this@MainActivity, "Failed", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                })
+        }else{
+            Toast.makeText(this@MainActivity, "You must enter value", Toast.LENGTH_SHORT).show()
+            editTextTwo.setText("")
+        }
     }
 }
