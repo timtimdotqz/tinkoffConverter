@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.isDigitsOnly
 import com.cyansmoke.converter.utils.showIf
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -35,13 +36,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        //переопределяем нажатие на кнопку Done(изменённый Enter)
+        //переопределяем нажатие на кнопку Done(изменённый Enter на клавиатуре)
         editTextFirst.setOnEditorActionListener { _, actionId, _ ->
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
-                    progressBarMain.showIf(false)
                     //запрос на валютную пару
-                    giveMePair(firstCurrency, secondCurrency, editTextFirst, editTextSecond)
+                    if(editTextFirst.text.toString()!="") {
+                        progressBarMain.showIf(false)
+                        giveMePair(firstCurrency, secondCurrency, editTextFirst, editTextSecond)
+                    }else{
+                        Toast.makeText(this@MainActivity, "You must enter value", Toast.LENGTH_SHORT).show()
+                    }
                     true
                 }
                 else -> false
@@ -50,8 +55,12 @@ class MainActivity : AppCompatActivity() {
         editTextSecond.setOnEditorActionListener { _, actionId, _ ->
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
-                    progressBarMain.showIf(false)
-                    giveMePair(secondCurrency, firstCurrency, editTextSecond, editTextFirst)
+                    if(editTextSecond.text.toString()!=""){
+                        progressBarMain.showIf(false)
+                        giveMePair(secondCurrency, firstCurrency, editTextSecond, editTextFirst)
+                    }else{
+                        Toast.makeText(this@MainActivity, "You must enter value", Toast.LENGTH_SHORT).show()
+                    }
                     true
                 }
                 else -> false
