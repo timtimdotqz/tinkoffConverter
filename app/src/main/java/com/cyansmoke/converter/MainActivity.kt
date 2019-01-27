@@ -1,6 +1,5 @@
 package com.cyansmoke.converter
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -9,7 +8,6 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.isDigitsOnly
 import com.cyansmoke.converter.utils.showIf
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -32,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     var secondCurrency: String? = null
     //map для сохранения кэша пар валют в виде "пара" : "значение"
     val mapCurrencies: MutableMap<String, Double> = mutableMapOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -107,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun giveMePair(first: String?, second: String?, editTextOne: EditText, editTextTwo: EditText) {
-        if(editTextOne.text.toString()!="") {
+        if (editTextOne.text.toString() != "") {
             progressBarMain.showIf(false)
             retrofitConnector.getCourse(first + "_" + second)
                 .enqueue(object : Callback<JsonObject> {
@@ -142,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                 })
-        }else{
+        } else {
             Toast.makeText(this@MainActivity, "You must enter value", Toast.LENGTH_SHORT).show()
             editTextTwo.setText("")
         }
